@@ -22,11 +22,10 @@ function Dashboard(props) {
       setCoordinates(latLng);
       props.updateLat(latLng);
       props.updateLng(latLng);
-      window.location.reload()
     };
 
   
-        if(props.CurrentUser.length===1 && !props.CurrentUser.lat)
+        if(props.CurrentUser&&props.CurrentUser.lat===0.0)
             return(
                 <Container>
                     <div>
@@ -67,7 +66,7 @@ function Dashboard(props) {
     <div>
         <h1>you have done it jeffrey</h1>
         <Container fluid='sm'>
-            <UserLanding CurrentUser={props.CurrentUser}/>
+            <UserLanding CurrentUser={props.CurrentUser} Servicers={props.Servicers}/>
         </Container>
     </div>
         )

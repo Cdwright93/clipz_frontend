@@ -17,6 +17,9 @@ const api2 = axios.create({
 const api3 = axios.create({
   baseURL: 'https://localhost:44394/api/authentication'
 })
+const api4 = axios.create({
+  baseURL:'https://localhost:44394/api/users/all'
+})
 
 
 class App extends Component{
@@ -24,11 +27,12 @@ class App extends Component{
     super();
     this.state = {
       CurrentUser: [],
-      CurrentLocation: [],
+      Servicers: [],
     }
   }
   componentDidMount(){
     this.getUser(token)
+    this.getAllServicers()
   }
   getUser = async (token) => {
     let data = await api1.get('/', {headers:{ "Authorization" : `Bearer ${token}`}}).then(({ data }) => data)
@@ -41,7 +45,6 @@ class App extends Component{
     const config = {
       headers:{ Authorization : `Bearer ${apitoken}`}
     };
-
     const body = [
       {
         "path": "lat",
@@ -68,7 +71,12 @@ class App extends Component{
     ];
       let res = await axios.patch(address, body, config)
       console.log(res)
+      window.location.reload()
       }
+  getAllServicers = async () => {
+    let data = await api4.get('/').then(({ data }) => data)
+    this.setState({ Servicers : data })
+  }
   SignUpUser = async (event) => {
     event.preventDefault()
     let res = await api3.post('/',{firstname:event.target.firstname.value,
@@ -99,7 +107,7 @@ class App extends Component{
           <Row>
 
               <LoginRegister CurrentUser = {this.state.CurrentUser} SignInUser={this.SignInUser} SignUpUser={this.SignUpUser} getUser={this.getUser} token={this.token}/>
-              <Dashboard CurrentUser={this.state.CurrentUser} updateLat={this.updateLat} updateLng={this.updateLng}/>
+              <Dashboard CurrentUser={this.state.CurrentUser} updateLat={this.updateLat} updateLng={this.updateLng} Servicers={this.state.Servicers}/>
           </Row>
         </Container>
       </div>
