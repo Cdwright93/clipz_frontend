@@ -7,15 +7,18 @@ import {
     InfoWindow,
 } from "@react-google-maps/api"
 import googleApiKey from '../apikeys';
-import  Button  from "react-bootstrap/Button";
+import  {Button,Container}  from "react-bootstrap";
 
 
 function UserLanding(props) {
     const [selectedServicer, setSelectedServicer] = useState(null);
 
+    const [selectedWindow, setSelectedWindow] = useState(null)
+
     const {isLoaded, loadError} = useLoadScript({
         googleMapsApiKey: googleApiKey
     });
+    const selectedServices= props.selectedServices
     const servicers = props.Servicers
     const center = {
         lat: props.CurrentUser.lat,
@@ -36,6 +39,7 @@ function UserLanding(props) {
             center={center}
             zoom ={14}
             props={props}
+            selectedServices={selectedServices}
             >
         {servicers.map(servicer => (
         <Marker
@@ -55,18 +59,24 @@ function UserLanding(props) {
       ))}
       {selectedServicer && (
           <InfoWindow 
+          props={props}
           position={{
             lat: selectedServicer.lat,
             lng: selectedServicer.lng
           }}
           onCloseClick={()=> {
-        setSelectedServicer(null);
-        }}
+        setSelectedServicer(null)
+        setSelectedWindow(null)
+        props.HandleServClose()}
+    }
           >
               <div>
                   <h3>{selectedServicer.firstName}</h3><br/>
                   rating:<h5>{selectedServicer.overall_rating}</h5>
-                  <Button variant="success">click me for services</Button>
+                  <Button variant="success" onClick={() => {
+                    props.getSelectedServicer(selectedServicer)
+                    setSelectedWindow(selectedServicer)}
+                  }>click me </Button>
               </div>
           </InfoWindow>
       )}

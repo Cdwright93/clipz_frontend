@@ -64,9 +64,15 @@ function Dashboard(props) {
     if(props.CurrentUser.lng)
     return(
     <div>
-        <h1>you have done it jeffrey</h1>
+        <h1>Welcome to Clipz!</h1>
         <Container fluid='sm'>
-            <UserLanding CurrentUser={props.CurrentUser} Servicers={props.Servicers}/>
+            <UserLanding 
+            CurrentUser={props.CurrentUser}
+            Servicers={props.Servicers}
+            getSelectedServicer={props.getSelectedServicer}
+            SelectedServices={props.SelectedServices}
+            HandleServClose={props.HandleServClose}
+            />
         </Container>
     </div>
         )
