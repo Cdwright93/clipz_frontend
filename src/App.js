@@ -2,7 +2,7 @@ import './App.css'
 import React, { Component } from 'react';
 import axios from 'axios';
 import NavBar from './Components/Navbar';
-import {Container, Row, Button} from 'react-bootstrap';
+import {Container, Row, Col} from 'react-bootstrap';
 // import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import LoginRegister from './Components/LoginRegister';
 import Dashboard from './Components/Dashboard';
@@ -38,6 +38,8 @@ class App extends Component{
       SelectedServices: [],
       SelectedServicer:[],
       Appointments:[],
+      Weather:[],
+      distanceFromServicer: null,
     }
   }
   componentDidMount(){
@@ -48,7 +50,13 @@ class App extends Component{
     let data = await api1.get('/', {headers:{ "Authorization" : `Bearer ${token}`}}).then(({ data }) => data)
     this.setState({ CurrentUser : data })
     this.getAppointments(data)
+    this.getWeather(data)
     console.log(data)
+  }
+  getWeather = async (props) => {
+    let query = axios.get(`https://api.openweathermap.org/data/2.5/onecall?lat=${props.lat}&lon=${props.lng}&exclude=current,minutely,hourly&units=imperial&appid=8badd326ebb24a69942696dd54245171`)
+    this.setState({Weather:(await query).data.daily})
+    console.log((await query).data.daily)
   }
   getAppointments = async (data) => {
     let query = await api6.get(`/${data.id}`,).then(({ data }) => data)
@@ -95,9 +103,10 @@ class App extends Component{
       window.location.reload()
       }
   getAllServicers = async () => {
-    let data = await api4.get('/').then(({ data }) => data)
-    this.setState({ Servicers : data })
+    let data1 = await api4.get('/').then(({ data }) => data)
+    this.setState({ Servicers : data1 })
   }
+
   SignUpUser = async (event) => {
     event.preventDefault()
     let res = await api3.post('/',{firstname:event.target.firstname.value,
@@ -114,6 +123,12 @@ class App extends Component{
   HandleServClose = async () => {
     this.setState({SelectedServicer : [] })
     this.setState({SelectedServices : [] })
+    this.setState({distanceFromServicer: null})
+  }
+  GetDistance = async (servicer) => {
+    let data = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${this.state.CurrentUser.lat},${this.state.CurrentUser.lng}&destinations=${servicer.lat}%2C${servicer.lng}&key=AIzaSyA24wquj_memv88Dh_q4QzlFGQ_8k969c8`)
+    let distance = parseFloat(data.data.rows[0].elements[0].distance.text)
+    this.setState({distanceFromServicer: distance})
   }
   MakeAppointment = async (event) => {
     event.preventDefault()
@@ -127,8 +142,8 @@ class App extends Component{
     console.log(res)
     window.location.reload()
   }
-  CompleteAppointment = async (key) => {
-    const address = `https://localhost:44394/api/appointments/${key}/`;
+  CompleteAppointment = async (appointment) => {
+    const address = `https://localhost:44394/api/appointments/${appointment.appointmentId}/`;
     const body = 
     [
       {
@@ -139,6 +154,7 @@ class App extends Component{
     ];
     let res = await axios.patch(address, body)
     console.log(res)
+    window.location.reload()
     }
   SignInUser = async (event) => {
     event.preventDefault()
@@ -153,14 +169,9 @@ class App extends Component{
 
       <div>
       <NavBar />
-        <Container>
+        <Container fluid="sm">
           <Row>
-            <CurrentUserDetail 
-              Appointments={this.state.Appointments}
-              CompleteAppointment={this.state.CompleteAppointment}
-            />
-          </Row>
-          <Row>
+            <Col>
               <LoginRegister 
                 CurrentUser = {this.state.CurrentUser}
                 SignInUser={this.SignInUser}
@@ -168,6 +179,7 @@ class App extends Component{
                 getUser={this.getUser} 
                 token={this.token}
               />
+            </Col>
               <Dashboard 
               CurrentUser={this.state.CurrentUser} 
               SelectedServices={this.state.SelectedServices}
@@ -176,7 +188,17 @@ class App extends Component{
               Servicers={this.state.Servicers}
               getSelectedServicer={this.getSelectedServicer}
               HandleServClose={this.HandleServClose}
+              GetDistance={this.GetDistance}
+              distanceFromServicer={this.state.distanceFromServicer}
               />
+          <Row>
+            <CurrentUserDetail 
+              Appointments={this.state.Appointments}
+              CompleteAppointment={this.CompleteAppointment}
+              CurrentUser={this.state.CurrentUser}
+              Weather={this.state.Weather}
+            />
+          </Row>
           </Row>
         </Container>
         <div>
@@ -185,6 +207,7 @@ class App extends Component{
             SelectedServices={this.state.SelectedServices}
             SelectedServicer={this.state.SelectedServicer}
             MakeAppointment={this.MakeAppointment}
+            distanceFromServicer={this.state.distanceFromServicer}            
             />
           </Container>
         </div>

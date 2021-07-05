@@ -3,11 +3,11 @@ import {
     GoogleMap,
     useLoadScript,
     Marker,
-    infoWindow,
     InfoWindow,
 } from "@react-google-maps/api"
 import googleApiKey from '../apikeys';
-import  {Button,Container}  from "react-bootstrap";
+import  {Button}  from "react-bootstrap";
+import axios from "axios";
 
 
 function UserLanding(props) {
@@ -19,7 +19,7 @@ function UserLanding(props) {
         googleMapsApiKey: googleApiKey
     });
     const selectedServices= props.selectedServices
-    const servicers = props.Servicers
+    const servicers = props.Servicers  //<==============================//////HEEEERREEEE
     const center = {
         lat: props.CurrentUser.lat,
         lng: props.CurrentUser.lng
@@ -48,9 +48,12 @@ function UserLanding(props) {
             lat: servicer.lat,
             lng: servicer.lng
           }}
-          onClick={() => {
-            setSelectedServicer(servicer);
-          }}
+          // distance={ 
+          //  props.GetDistance(servicer)
+          // }
+          onClick={() => {{
+            setSelectedServicer(servicer)}
+          props.GetDistance(servicer)}}
           icon={{
             url: 'https://www.svgrepo.com/show/130203/mower.svg',
             scaledSize: new window.google.maps.Size(35, 35)
@@ -58,7 +61,7 @@ function UserLanding(props) {
         />
       ))}
       {selectedServicer && (
-          <InfoWindow 
+          <InfoWindow
           props={props}
           position={{
             lat: selectedServicer.lat,
@@ -68,15 +71,16 @@ function UserLanding(props) {
         setSelectedServicer(null)
         setSelectedWindow(null)
         props.HandleServClose()}
-    }
-          >
+        }>
               <div>
                   <h3>{selectedServicer.firstName}</h3><br/>
-                  rating:<h5>{selectedServicer.overall_rating}</h5>
+                  Rating:<h5>{selectedServicer.overall_rating}/5</h5>
+                  Service Range:<h5>{selectedServicer.service_distance} mi</h5> 
+                  Distance:<h5>{props.distanceFromServicer} mi</h5>
                   <Button variant="success" onClick={() => {
                     props.getSelectedServicer(selectedServicer)
                     setSelectedWindow(selectedServicer)}
-                  }>click me </Button>
+                  }>Book Appointment</Button>
               </div>
           </InfoWindow>
       )}

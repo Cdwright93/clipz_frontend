@@ -72,6 +72,8 @@ function Dashboard(props) {
             getSelectedServicer={props.getSelectedServicer}
             SelectedServices={props.SelectedServices}
             HandleServClose={props.HandleServClose}
+            GetDistance={props.GetDistance}
+            distanceFromServicer={props.distanceFromServicer}
             />
         </Container>
     </div>
