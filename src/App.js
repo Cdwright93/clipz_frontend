@@ -28,6 +28,9 @@ const api5 = axios.create({
 const api6 = axios.create({
   baseURL:'https://localhost:44394/api/appointments'
 })
+const api7 = axios.create({
+  baseURL:'https://localhost:44394/api/ratings/'
+})
 
 class App extends Component{
   constructor(){
@@ -102,11 +105,74 @@ class App extends Component{
       console.log(res)
       window.location.reload()
       }
+  setActive = async () => {
+    const address = 'https://localhost:44394/api/users/update/';
+    const apitoken = localStorage.getItem('data')
+    const config = {
+      headers:{ Authorization : `Bearer ${apitoken}`}
+    };
+
+    const body = [
+      {
+        "path": "is_working",
+        "op": "replace",
+        "value": true
+      }
+  ];
+    let res = await axios.patch(address, body, config)
+    console.log(res)
+    window.location.reload()
+    }
+  setInactive = async () => {
+    const address = 'https://localhost:44394/api/users/update/';
+    const apitoken = localStorage.getItem('data')
+    const config = {
+      headers:{ Authorization : `Bearer ${apitoken}`}
+    };
+
+    const body = [
+      {
+        "path": "is_working",
+        "op": "replace",
+        "value": false
+      }
+  ];
+    let res = await axios.patch(address, body, config)
+    console.log(res)
+    window.location.reload()
+    }
+  setDistance = async (event) => {
+    event.preventDefault()
+    const address = 'https://localhost:44394/api/users/update/';
+    const apitoken = localStorage.getItem('data')
+    const config = {
+      headers:{ Authorization : `Bearer ${apitoken}`}
+    };
+
+    const body = [
+      {
+        "path": "service_distance",
+        "op": "replace",
+        "value": event.target.distance.value
+      }
+  ];
+    let res = await axios.patch(address, body, config)
+    console.log(res)
+    window.location.reload()
+    }
   getAllServicers = async () => {
     let data1 = await api4.get('/').then(({ data }) => data)
     this.setState({ Servicers : data1 })
   }
-
+  addServices = async (event) => {
+    event.preventDefault()
+    let res = await api5.post('/',{
+      UserId: this.state.CurrentUser.id,
+      Name:event.target.service.value,
+      Price:event.target.price.value,
+    })
+    window.location.reload()
+  }
   SignUpUser = async (event) => {
     event.preventDefault()
     let res = await api3.post('/',{firstname:event.target.firstname.value,
@@ -142,6 +208,24 @@ class App extends Component{
     console.log(res)
     window.location.reload()
   }
+  becomeClipper = async () => {
+    const address = 'https://localhost:44394/api/users/update/';
+    const apitoken = localStorage.getItem('data')
+    const config = {
+      headers:{ Authorization : `Bearer ${apitoken}`}
+    };
+
+    const body = [
+      {
+        "path": "is_servicer",
+        "op": "replace",
+        "value": true
+      }
+  ];
+    let res = await axios.patch(address, body, config)
+    console.log(res)
+    window.location.reload()
+  }
   CompleteAppointment = async (appointment) => {
     const address = `https://localhost:44394/api/appointments/${appointment.appointmentId}/`;
     const body = 
@@ -155,7 +239,34 @@ class App extends Component{
     let res = await axios.patch(address, body)
     console.log(res)
     window.location.reload()
-    }
+  }
+  RemoveAppointment = async (appointment) => {
+    const address = `https://localhost:44394/api/appointments/${appointment.appointmentId}/`;
+    const body = 
+    [
+      {
+        "path": "status",
+        "op": "replace",
+        "value": "Remove"
+      }
+    ];
+    let res = await axios.patch(address, body)
+    window.location.reload()
+  }
+  ReviewClipperGood = async (appointment) => {
+    let res = await api7.post('/',{
+      UserId: appointment.servicerId,
+      rating : 5
+    })
+    window.location.reload()
+  }
+  ReviewClipperBad = async (appointment) => {
+    let res = await api7.post('/',{
+      UserId: appointment.servicerId,
+      rating : 0
+    })
+    window.location.reload()
+  }
   SignInUser = async (event) => {
     event.preventDefault()
     let res = await api2.post('/',{username:event.target.username.value,
@@ -164,11 +275,17 @@ class App extends Component{
     this.getUser(token)
     window.location.reload()
   }
+  SignOut = () => {
+    localStorage.removeItem('data')
+    window.location.reload()
+  }
   render(){
   return(
 
       <div>
-      <NavBar />
+      <NavBar 
+      SignOut={this.SignOut}
+      />
         <Container fluid="sm">
           <Row>
             <Col>
@@ -197,6 +314,14 @@ class App extends Component{
               CompleteAppointment={this.CompleteAppointment}
               CurrentUser={this.state.CurrentUser}
               Weather={this.state.Weather}
+              addServices={this.addServices}
+              setActive={this.setActive}
+              setInactive={this.setInactive}
+              setDistance={this.setDistance}
+              becomeClipper={this.becomeClipper}
+              RemoveAppointment={this.RemoveAppointment}
+              ReviewClipperGood={this.ReviewClipperGood}
+              ReviewClipperBad={this.ReviewClipperBad}
             />
           </Row>
           </Row>
@@ -207,7 +332,7 @@ class App extends Component{
             SelectedServices={this.state.SelectedServices}
             SelectedServicer={this.state.SelectedServicer}
             MakeAppointment={this.MakeAppointment}
-            distanceFromServicer={this.state.distanceFromServicer}            
+            distanceFromServicer={this.state.distanceFromServicer} 
             />
           </Container>
         </div>

@@ -19,7 +19,7 @@ function UserLanding(props) {
         googleMapsApiKey: googleApiKey
     });
     const selectedServices= props.selectedServices
-    const servicers = props.Servicers  //<==============================//////HEEEERREEEE
+    const servicers = props.Servicers  
     const center = {
         lat: props.CurrentUser.lat,
         lng: props.CurrentUser.lng
@@ -31,7 +31,7 @@ function UserLanding(props) {
 
     if (loadError) return "Error loading maps";
     if (!isLoaded) return "Loading Maps"
-
+if (props.CurrentUser.is_servicer === false)
     return (
         <div>
             <GoogleMap
@@ -86,6 +86,9 @@ function UserLanding(props) {
       )}
             </GoogleMap>
         </div>
+    )
+    return (
+      null
     )
 }
 export default UserLanding;
