@@ -57,7 +57,7 @@ class App extends Component{
     console.log(data)
   }
   getWeather = async (props) => {
-    let query = axios.get(`https://api.openweathermap.org/data/2.5/onecall?lat=${props.lat}&lon=${props.lng}&exclude=current,minutely,hourly&units=imperial&appid=8badd326ebb24a69942696dd54245171`)
+    let query = axios.get(`https://api.openweathermap.org/data/2.5/onecall?lat=${props.lat}&lon=${props.lng}&exclude=current,minutely,hourly&units=imperial&appid=`)//<------OPEN WEATHER API KEY
     this.setState({Weather:(await query).data.daily})
     console.log((await query).data.daily)
   }
@@ -192,7 +192,7 @@ class App extends Component{
     this.setState({distanceFromServicer: null})
   }
   GetDistance = async (servicer) => {
-    let data = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${this.state.CurrentUser.lat},${this.state.CurrentUser.lng}&destinations=${servicer.lat}%2C${servicer.lng}&key=AIzaSyA24wquj_memv88Dh_q4QzlFGQ_8k969c8`)
+    let data = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${this.state.CurrentUser.lat},${this.state.CurrentUser.lng}&destinations=${servicer.lat}%2C${servicer.lng}&key=`)//<--GOOGLE DISTANCE MATRIX API
     let distance = parseFloat(data.data.rows[0].elements[0].distance.text)
     this.setState({distanceFromServicer: distance})
   }
